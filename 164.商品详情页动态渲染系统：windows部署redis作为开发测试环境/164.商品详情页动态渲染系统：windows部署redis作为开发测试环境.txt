@@ -1,0 +1,12 @@
+
+我们之前讲解过了，咱们因为是在我的旧电脑上玩儿，12g内存，每次都开几台虚拟机，然后启动eclipse，启动一大堆spring cloud服务，内存吃不消
+
+所以开发、测试环境与生产部署环境隔离，虚拟机上部署的一套作为生产环境
+
+windows上，我们启动eclipse+一大堆服务，同时将rabbitmq，mysql，redis，等，全部在windows上部署，作为咱们的测试环境
+
+这一讲，在windows上部署一个最基本的单实例的redis，可以用就行了，可以写kv存储就可以了
+
+上生产环境，也是直接连接twemproxy，连接twemproxy中间件+redis集群，跟本地连接单个的redis实例，是一个意思
+
+原生的redis是不支持windows的，但是微软搞了一个可以在windows上部署的redis版本，供我们学习、开发以及测试来使用的

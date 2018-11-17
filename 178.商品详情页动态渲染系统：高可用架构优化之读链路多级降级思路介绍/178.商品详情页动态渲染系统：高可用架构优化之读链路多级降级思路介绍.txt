@@ -1,0 +1,20 @@
+
+读链路：nginx local cache -> 本机房redis从集群 -> 数据直连服务的jvm堆缓存（之前讲解，这次没做） -> 其他机房redis主集群 -> 依赖服务
+
+读链路的降级
+
+本机房redis从集群可能会挂掉，可能性会大一些：降级为直接连数据直连服务
+
+数据直连服务也可能会挂掉：降级为跨机房直接连redis主集群
+
+t1 = os.time();
+
+t2 = os.time();
+os.difftime(t2, t1)
+
+if not resp then  
+    ngx.say("request error :", err)  
+    return  
+end
+
+2310879776

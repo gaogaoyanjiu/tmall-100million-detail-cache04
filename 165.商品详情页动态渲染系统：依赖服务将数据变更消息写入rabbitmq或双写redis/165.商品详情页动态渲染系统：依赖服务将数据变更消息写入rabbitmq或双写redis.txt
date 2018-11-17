@@ -1,0 +1,85 @@
+
+1、基于spring boot整合rabbitmq的发送与消费
+
+（1）pom.xml
+
+<dependency>  
+    <groupId>org.springframework.boot</groupId>  
+    <artifactId>spring-boot-starter-amqp</artifactId>  
+</dependency>
+
+（2）application.yml
+
+spring: 
+  rabbitmq:
+    host: localhost
+    port: 15672  
+    username: rabbitadmin  
+    password: 123456
+
+（3）生产者
+
+@Component  
+public class RabbitMQSender {  
+
+    @Autowired  
+    private AmqpTemplate rabbitTemplate;  
+   
+    public void send(String message) {  
+        this.rabbitTemplate.convertAndSend("my-queue", message);  
+    }  
+	
+}  
+
+（4）消费者
+
+@Component  
+@RabbitListener(queues = "my-queue")  
+public class RabbitMQReceiver {  
+  
+    @RabbitHandler  
+    public void process(String message) {  
+        System.out.println("从my-queue队列接收到一条消息：" + message);  
+    }  
+  
+}  
+
+（5）在rabbitmq管理界面中创建队列
+
+rabbitmqctl set_permissions -p / rabbitadmin '.*' '.*' '.*' 
+
+在web界面中，到admin下，点击一下那个用户，set一下permission，就可以创建queue了
+
+2、spring boot整合redis
+
+（1）pom.xml
+
+<dependency>
+	<groupId>com.alibaba</groupId>
+	<artifactId>fastjson</artifactId>
+	<version>1.1.43</version>
+</dependency>
+<dependency>
+	<groupId>redis.clients</groupId>
+	<artifactId>jedis</artifactId>
+</dependency>
+
+（2）Application
+
+@Bean
+public Jedis jedis() {
+	JedisPoolConfig config = new JedisPoolConfig();
+	config.setMaxActive(100);
+	config.setMaxIdle(5);
+	config.setMaxWait(1000 * 100);
+	config.setTestOnBorrow(true);
+	pool = new JedisPool(config, "localhost", 6379);
+}
+
+3、商品服务数据变更，将消息写入rabbitmq
+
+时效性比较低的数据，走rabbitmq，然后后面就接着整套动态渲染系统去玩儿
+
+4、价格服务和库存服务，数据变更，直接将数据双写到redis中
+
+时效性比较高的数据，直接mysql+redis双写，不走冬天渲染系统，写到redis之后，后面走OneService服务提供页面的ajax调用

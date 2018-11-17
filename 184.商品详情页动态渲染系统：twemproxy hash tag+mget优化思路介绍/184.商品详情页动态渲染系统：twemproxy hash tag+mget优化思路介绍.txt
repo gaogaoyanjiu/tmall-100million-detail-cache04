@@ -1,0 +1,54 @@
+
+我们其实twemproxy就是将Redis集群做成了很多个分片，相当于是部署了很多个redis主实例
+
+然后通过twemproxy中间件，将数据散列存储到多个redis实例中去，每个redis实例中存储一部分的数据
+
+但是还记得，我们用了mget那个优化操作么
+
+product_1
+product_property_1
+product_specification_1
+
+这是3个key，可能会散列到不同的redis实例上去
+
+此时直接用mget很坑，可能要走多次网络请求，连接多个redis实例才能获取到所有数据
+
+所以这里的优化思路，就是用hash tag这个功能
+
+通过hash tag，将一个商品关联的数据（可能会被mget一下子一起批量获取的数据），全部路由到同一个redis实例上去
+
+这样的话呢，后面在获取数据的时候，直接就会路由到同一个redis实例，一下子mget出来多个数据
+
+就不需要连接多次到不同的redis实例上去
+
+1、twemproxy中配置一个东西，hash_tag
+
+server1:  
+  listen: 127.0.0.1:1111  
+  hash: fnv1a_64  
+  distribution: ketama  
+  redis: true  
+  hash_tag: "::"  
+  servers:  
+   - 127.0.0.1:6660:1 server1  
+   - 127.0.0.1:6661:1 server2  
+
+2、写和读，都按照hash_tag格式来
+   
+product:1:
+product_property:1:
+product_specification:1:
+
+写的时候，不是按照product_1这种完整的串来计算hash值和路由的
+
+是按照两个冒号中间的值来计算hash值和路由的
+
+比如上面3个值，两个冒号中间都是1，那么计算出来的hash值一定是一样的，然后三个key-value对一定会路由到同一个redis实例上去
+
+在读的时候
+
+mget product:1: product_property:1: product_specification:1:
+
+读的时候，同样是根据两个冒号中间的值来路由和读取，这样的话，3个key会路由到同一个redis实例上去，一次性全部读出来
+
+2310879776

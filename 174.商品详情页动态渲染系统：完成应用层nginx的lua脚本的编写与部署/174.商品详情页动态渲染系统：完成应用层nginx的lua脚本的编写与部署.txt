@@ -1,0 +1,70 @@
+
+app.conf
+
+lua_shared_dict my_cache 128m;
+
+local function close_redis(red)  
+	if not red then  
+		return  
+	end  
+	local pool_max_idle_time = 10000 
+	local pool_size = 100 
+	local ok, err = red:set_keepalive(pool_max_idle_time, pool_size)  
+	if not ok then  
+		ngx.say("set keepalive error : ", err)  
+	end  
+end  
+  
+local redis = require("resty.redis")  
+   
+local red = redis:new()  
+red:set_timeout(1000)  
+local ip = "127.0.0.1"  
+local port = 6660  
+local ok, err = red:connect(ip, port)  
+if not ok then  
+    ngx.say("connect to redis error : ", err)  
+    return close_redis(red)  
+end  
+  
+local resp, err = red:get("msg")  
+if not resp then  
+    ngx.say("get msg error : ", err)  
+    return close_redis(red)  
+end  
+
+if resp == ngx.null then  
+    resp = ''  
+end  
+
+ngx.say("msg : ", resp)  
+  
+close_redis(red)
+
+wget https://raw.githubusercontent.com/pintsized/lua-resty-http/master/lib/resty/http_headers.lua  
+wget https://raw.githubusercontent.com/pintsized/lua-resty-http/master/lib/resty/http.lua 
+
+cd /usr/hello/lualib/resty/
+wget https://raw.githubusercontent.com/bungle/lua-resty-template/master/lib/resty/template.lua
+mkdir /usr/hello/lualib/resty/html
+cd /usr/hello/lualib/resty/html
+wget https://raw.githubusercontent.com/bungle/lua-resty-template/master/lib/resty/template/html.lua
+
+在app.conf的server中配置模板位置
+
+set $template_location "/templates";  
+set $template_root "/usr/servers/distribution_nginx/distribution_app/templates";
+
+product id: {* productId *}<br/>
+product name: {* productName *}<br/>
+product picture list: {* productPictureList *}<br/>
+product specification: {* productSpecification *}<br/>
+product service: {* productService *}<br/>
+product color: {* productColor *}<br/>
+product size: {* productSize *}<br/>
+shop id: {* shopId *}<br/>
+shop name: {* shopName *}<br/>
+shop level: {* shopLevel *}<br/>
+shop good cooment rate: {* shopGoodCommentRate *}<br/>
+
+2310879776

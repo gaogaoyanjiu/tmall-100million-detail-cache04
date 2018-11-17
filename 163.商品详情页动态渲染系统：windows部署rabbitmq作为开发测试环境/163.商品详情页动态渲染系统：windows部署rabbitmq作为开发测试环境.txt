@@ -1,0 +1,35 @@
+
+之前在虚拟机linux上安装了rabbitmq，作为生产环境
+
+在本地windows上，我们需要去搭建一套本地的开发和测试环境，数据库已经安装了，rabbitmq
+
+从下一讲开始，我们其实就可以去将数据写入rabbitmq，然后开发同步服务，聚合服务，等等从rabbitmq里面消费数据，写入redis
+
+1、安装erlang
+
+下载erlang：http://www.erlang.org/downloads，otp_win64_20.0.exe，直接安装
+
+在windows设置环境变量
+
+ERLANG_HOME=/usr/local/erlang
+PATH=$ERLANG_HOME/bin:$PATH
+
+erl
+
+3、安装rabbitmq
+
+http://www.rabbitmq.com/download.html 
+
+cd rabbitmq-3.6.1/sbin/
+rabbitmq-plugins.bat enable rabbitmq_management
+
+后台启动rabbitmq server
+
+添加管理员账号
+
+./rabbitmqctl add_user rabbitadmin 123456
+./rabbitmqctl set_user_tags rabbitadmin administrator
+
+进入管理页面
+
+15672端口号，输入用户名和密码

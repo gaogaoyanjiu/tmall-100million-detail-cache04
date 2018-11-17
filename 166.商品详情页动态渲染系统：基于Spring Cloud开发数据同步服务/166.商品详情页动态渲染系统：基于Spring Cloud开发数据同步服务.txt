@@ -1,0 +1,82 @@
+
+1、基于spring boot整合rabbitmq的发送与消费
+
+（1）pom.xml
+
+<dependency>  
+    <groupId>org.springframework.boot</groupId>  
+    <artifactId>spring-boot-starter-amqp</artifactId>  
+</dependency>
+
+（2）application.yml
+
+spring: 
+  rabbitmq:
+    host: localhost
+    port: 15672  
+    username: rabbitadmin  
+    password: 123456
+
+（3）生产者
+
+@Component  
+public class RabbitMQSender {  
+
+    @Autowired  
+    private AmqpTemplate rabbitTemplate;  
+   
+    public void send(String message) {  
+        this.rabbitTemplate.convertAndSend("my-queue", message);  
+    }  
+	
+}  
+
+（4）消费者
+
+@Component  
+@RabbitListener(queues = "my-queue")  
+public class RabbitMQReceiver {  
+  
+    @RabbitHandler  
+    public void process(String message) {  
+        System.out.println("从my-queue队列接收到一条消息：" + message);  
+    }  
+  
+}  
+
+（5）在rabbitmq管理界面中创建队列
+
+2、spring boot整合redis
+
+（1）pom.xml
+
+<dependency>
+	<groupId>com.alibaba</groupId>
+	<artifactId>fastjson</artifactId>
+	<version>1.1.43</version>
+</dependency>
+<dependency>
+	<groupId>redis.clients</groupId>
+	<artifactId>jedis</artifactId>
+</dependency>
+
+（2）Application
+
+@Bean
+public Jedis jedis() {
+	return new Jedis("127.0.0.1", 6379);
+}
+
+3、基于spring cloud开发数据同步服务
+
+（1）接收到增删改消息
+
+（2）直接基于Fegion调用依赖服务接口，拉取数据，对redis原子数据进行增删改操作
+
+（3）再将数据变更消息按照维度发送到rabbitmq
+
+4、基于spring cloud开发数据聚合服务
+
+（1）接收到数据变更消息
+
+（2）按照维度从redis中获取数据，聚合成一个维度数据，写入redis中维度聚合数据

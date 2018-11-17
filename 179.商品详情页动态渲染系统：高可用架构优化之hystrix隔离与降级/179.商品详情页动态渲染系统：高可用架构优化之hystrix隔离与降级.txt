@@ -1,0 +1,12 @@
+
+这块说，hystrix之前已经深入讲解过了，在spring cloud里面，fegion去掉用其他服务接口的操作，在这里肯定是要将hystrix跟fegion整合起来的
+
+这样的话，对后端的依赖服务的接口才能做资源隔离，不至于说某一个依赖服务故障，拖垮整个服务，有一个服务故障的时候，可以自动降级
+
+hystrix，还可以自动做限流
+
+依赖服务故障过多，限流，熔断，降级
+
+hystrix.command.default.execution.isolation.thread.timeoutInMilliseconds: 5000
+
+2310879776

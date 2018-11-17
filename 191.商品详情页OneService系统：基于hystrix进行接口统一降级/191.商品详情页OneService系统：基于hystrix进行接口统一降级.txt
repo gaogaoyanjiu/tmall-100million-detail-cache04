@@ -1,0 +1,41 @@
+
+1、让greeting-service支持hystrix
+
+（1）pom.xml
+
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-hystrix</artifactId>
+</dependency>
+
+（2）application.xml
+
+feign.hystrix.enabled=true
+
+（3）SayHelloService
+
+@FeignClient(value = "say-hello-service", fallback = SayHelloServiceFallback.class)  
+public interface SayHelloService {
+
+	@RequestMapping(value = "/sayHello", method = RequestMethod.GET)
+	public String sayHello(@RequestParam(value = "name") String name);
+	
+}
+
+（4）SayHelloServiceFallback
+
+@Component
+public class SayHelloServiceFallback implements SayHelloService {
+
+    @Override
+    public String sayHello(String name) {
+        return "error, " + name;
+    }
+	
+}
+
+（5）先保持SayHelloService启动，可以访问; 关闭SayHelloSerivce，再访问，调用失败直接走降级
+
+包括限流，自动熔断，调用失败，都会走降级
+
+2310879776

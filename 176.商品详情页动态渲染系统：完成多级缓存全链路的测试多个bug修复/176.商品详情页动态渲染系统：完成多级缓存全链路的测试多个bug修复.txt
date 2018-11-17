@@ -1,0 +1,17 @@
+
+为什么单独拉这么一讲，测试出来，这次讲解，有好几讲，都是单独的测试，调试
+
+因为上次在我们的群里，好多同学居然跟我提出抗议，之前讲解的时候，每次遇到的问题，直接就暂停，一会儿就好了？？？？
+
+他们没看到我调试的过程，是一种损失
+
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+</head>
+<body>
+product info: {* productInfo *}
+</body>
+</html>
+
+2310879776
